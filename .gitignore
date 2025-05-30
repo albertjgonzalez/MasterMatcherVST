@@ -1,0 +1,43 @@
+# JUCE
+*.jucer
+*.jucer.user.*
+*.jucer.user.*.backup
+*.jucer.user.*.lock
+*.jucer.user.*.tmp
+*.jucer.user.*.xml
+
+# Build files
+Builds/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.vcproj
+*.vcxproj.filters
+*.vcxproj.user
+*.vcxproj.filters.user
+*.vcxproj.filters.user.backup
+*.vcxproj.filters.user.lock
+*.vcxproj.filters.user.tmp
+*.vcxproj.filters.user.xml
+
+# Dependencies
+externals/
+
+# Build directories
+cmake-build-debug/
+cmake-build-release/
+CMakeFiles/
+
+# IDE files
+.vs/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
