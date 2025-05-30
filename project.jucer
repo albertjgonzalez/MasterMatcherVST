@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<JUCERPROJECT version="7.0.11">
+    <PROJECTSETTINGS>
+        <NAME>MatcheringVST</NAME>
+        <COMPANYNAME>LeftEarAudio</COMPANYNAME>
+        <BUNDLEIDENTIFIER>com.leftear.audio.matcheringvst</BUNDLEIDENTIFIER>
+        <PRODUCTCODE>12345678</PRODUCTCODE>
+        <PROJECTTYPE>AUDIO_PLUGIN</PROJECTTYPE>
+        <PLUGINFORMATS>
+            <FORMAT>VST3</FORMAT>
+            <FORMAT>AU</FORMAT>
+            <FORMAT>AAX</FORMAT>
+        </PLUGINFORMATS>
+        <PLUGINNAME>Matchering VST</PLUGINNAME>
+        <PLUGINGUID>12345678-1234-1234-1234-123456789012</PLUGINGUID>
+        <PLUGINLAYOUT>STANDARD</PLUGINLAYOUT>
+        <PLUGINLAYOUTWIDTH>600</PLUGINLAYOUTWIDTH>
+        <PLUGINLAYOUTHEIGHT>400</PLUGINLAYOUTHEIGHT>
+        <PLUGINLAYOUTBGCOLOR>0xff000000</PLUGINLAYOUTBGCOLOR>
+        <PLUGINSAMPLES>44100</PLUGINSAMPLES>
+        <PLUGINCHANNELS>2</PLUGINCHANNELS>
+        <PLUGINDAW>ALL</PLUGINDAW>
+        <PLUGINMIDI>NO</PLUGINMIDI>
+        <PLUGINVST3CAT>Fx</PLUGINVST3CAT>
+        <PLUGINAUCAT>AudioUnitEffect</PLUGINAUCAT>
+        <PLUGINAAACAT>Effect</PLUGINAAACAT>
+    </PROJECTSETTINGS>
+    <FILES>
+        <GROUP>
+            <NAME>Source Files</NAME>
+            <FILES>
+                <FILE>PluginProcessor.h</FILE>
+                <FILE>PluginProcessor.cpp</FILE>
+                <FILE>PluginEditor.h</FILE>
+                <FILE>PluginEditor.cpp</FILE>
+            </FILES>
+        </GROUP>
+        <GROUP>
+            <NAME>Resources</NAME>
+        </GROUP>
+    </FILES>
+    <EXPORTFORMATS>
+        <EXPORTFORMAT>
+            <NAME>Visual Studio</NAME>
+            <TYPE>VS2022</TYPE>
+            <COMPILER>MSVC</COMPILER>
+            <DEBUGSYMBOLS>YES</DEBUGSYMBOLS>
+            <TREATWARNINGSASERRORS>NO</TREATWARNINGSASERRORS>
+            <ARCHITECTURE>64</ARCHITECTURE>
+            <TARGETARCHITECTURE>64</TARGETARCHITECTURE>
+        </EXPORTFORMAT>
+    </EXPORTFORMATS>
+</JUCERPROJECT>
