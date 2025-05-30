@@ -1,9 +1,21 @@
+import sys
 import json
 import subprocess
 import os
 from pathlib import Path
 import logging
 from dotenv import load_dotenv
+from protocol import (
+    Message,
+    MessageType,
+    ProcessRequest,
+    ProcessResponse,
+    StatusUpdate,
+    ProtocolError,
+    validate_message
+)
+import time
+import matchering as mg
 
 # Set up logging
 logging.basicConfig(
@@ -15,110 +27,139 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
-def process_tracks(user_track_path: str, reference_track_path: str) -> dict:
-    """
-    Process tracks using the processor script
+class Server:
+    """Main server class for handling communication with C++ plugin"""
     
-    Args:
-        user_track_path: Path to the user's track
-        reference_track_path: Path to the reference track
+    def __init__(self):
+        self.is_processing = False
+        self.processing_start_time = None
+        self.processing_time = 0.0
+
+    def process_audio(self, request: ProcessRequest) -> ProcessResponse:
+        """
+        Process audio using Matchering
         
-    Returns:
-        Dictionary with processing results
-    """
-    try:
-        # Create output directory
-        output_dir = Path(os.getenv('OUTPUT_DIR', 'processed'))
-        output_dir.mkdir(exist_ok=True)
-        
-        # Generate output filename
-        output_filename = f"processed_{Path(user_track_path).stem}.wav"
-        output_path = str(output_dir / output_filename)
-        
-        logger.info(f"Processing tracks: {user_track_path} -> {output_path}")
-        
-        # Run the processor script
-        result = subprocess.run(
-            [
-                "python",
-                "processor.py",
-                user_track_path,
-                reference_track_path,
-                output_path
-            ],
-            capture_output=True,
-            text=True
-        )
-        
-        if result.returncode != 0:
-            logger.error(f"Processor error: {result.stderr}")
-            return {
-                "status": "error",
-                "message": f"Processor failed: {result.stderr}"
-            }
+        Args:
+            request: ProcessRequest object containing track paths and parameters
             
-        # Parse the JSON output
+        Returns:
+            ProcessResponse object with processing results
+        """
         try:
-            output = json.loads(result.stdout)
-        except json.JSONDecodeError:
-            logger.error(f"Invalid JSON output: {result.stdout}")
-            return {
-                "status": "error",
-                "message": "Invalid JSON output from processor"
-            }
+            logger.info("Starting audio processing...")
+            self.is_processing = True
+            self.processing_start_time = time.time()
             
-        return output
+            # Validate input files
+            if not os.path.exists(request.user_track):
+                raise FileNotFoundError(f"User track not found: {request.user_track}")
+                
+            if not os.path.exists(request.reference_track):
+                raise FileNotFoundError(f"Reference track not found: {request.reference_track}")
+            
+            # Create output directory if it doesn't exist
+            output_dir = os.path.dirname(request.output_path)
+            os.makedirs(output_dir, exist_ok=True)
+            
+            # Send status update
+            self.send_status("processing", 0.0, "Starting processing...")
+            
+            # Process audio using Matchering
+            mg.process(
+                target=request.user_track,
+                reference=request.reference_track,
+                results=[
+                    mg.pcm24(request.output_path)
+                ]
+            )
+            
+            self.processing_time = time.time() - self.processing_start_time
+            self.is_processing = False
+            
+            return ProcessResponse(
+                status="success",
+                output_path=request.output_path,
+                message="Processing completed successfully",
+                processing_time=self.processing_time
+            )
+            
+        except Exception as e:
+            logger.error(f"Error processing audio: {str(e)}")
+            self.is_processing = False
+            return ProcessResponse(
+                status="error",
+                message=str(e)
+            )
+
+    def send_status(self, status: str, progress: float, message: str):
+        """Send status update to C++ plugin"""
+        update = StatusUpdate(status, progress, message)
+        print(update.to_message().to_json())
+        sys.stdout.flush()
+
+    def handle_message(self, message: Message):
+        """Handle incoming message from C++ plugin"""
+        try:
+            validate_message(message)
+            
+            if message.type == MessageType.PROCESS_REQUEST:
+                request = ProcessRequest(**message.payload)
+                response = self.process_audio(request)
+                print(response.to_message().to_json())
+                sys.stdout.flush()
+                
+            elif message.type == MessageType.PING:
+                response = Message(
+                    type=MessageType.PONG,
+                    payload={"status": "alive"}
+                )
+                print(response.to_json())
+                sys.stdout.flush()
+                
+            else:
+                logger.warning(f"Unknown message type: {message.type}")
+                
+        except ProtocolError as e:
+            logger.error(f"Protocol error: {str(e)}")
+            error = Message(
+                type=MessageType.ERROR,
+                payload={"message": str(e)}
+            )
+            print(error.to_json())
+            sys.stdout.flush()
+
+    def run(self):
+        """Run the server main loop"""
+        logger.info("Starting MasterMatcher server...")
         
-    except Exception as e:
-        logger.error(f"Error processing tracks: {str(e)}")
-        return {
-            "status": "error",
-            "message": str(e)
-        }
+        while True:
+            try:
+                # Read message from C++ plugin
+                input_data = sys.stdin.readline()
+                if not input_data:
+                    continue
+                    
+                # Handle the message
+                message = Message.from_json(input_data)
+                self.handle_message(message)
+                
+            except KeyboardInterrupt:
+                logger.info("Server shutting down...")
+                break
+            except Exception as e:
+                logger.error(f"Server error: {str(e)}")
+                error = Message(
+                    type=MessageType.ERROR,
+                    payload={"message": str(e)}
+                )
+                print(error.to_json())
+                sys.stdout.flush()
+                continue
 
 def main():
-    """
-    Main entry point for the server
-    """
-    logger.info("Starting MasterMatcher server...")
-    
-    while True:
-        # Wait for input from the C++ plugin
-        try:
-            input_data = input()
-            if not input_data:
-                continue
-                
-            # Parse the input
-            try:
-                data = json.loads(input_data)
-                user_track = data['user_track']
-                reference_track = data['reference_track']
-            except (json.JSONDecodeError, KeyError) as e:
-                logger.error(f"Invalid input data: {str(e)}")
-                print(json.dumps({
-                    "status": "error",
-                    "message": f"Invalid input data: {str(e)}"
-                }))
-                continue
-                
-            # Process the tracks
-            result = process_tracks(user_track, reference_track)
-            
-            # Send the result back to the C++ plugin
-            print(json.dumps(result))
-            sys.stdout.flush()
-            
-        except KeyboardInterrupt:
-            logger.info("Server shutting down...")
-            break
-        except Exception as e:
-            logger.error(f"Server error: {str(e)}")
-            print(json.dumps({
-                "status": "error",
-                "message": f"Server error: {str(e)}"
-            }))
-            continue
+    """Main entry point"""
+    server = Server()
+    server.run()
 
 if __name__ == "__main__":
     main()

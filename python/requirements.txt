@@ -1,12 +1,18 @@
-matchering>=3.0.0
-numpy>=1.21.0
-scipy>=1.7.0
+matchering==2.0.6
+numpy>=1.19.0
+scipy>=1.5.0
 soundfile>=0.10.3
 python-dotenv>=0.19.0
+pytest>=6.2.0
+black>=21.7b0
+flake8>=3.9.2
+isort>=5.9.3
+pydantic>=1.9.0  # For data validation
+python-dateutil>=2.8.2  # For date/time handling
+requests>=2.26.0  # For HTTP requests if needed
 watchdog>=2.1.0  # For file system monitoring
 psutil>=5.8.0    # For process management
 pydub>=0.25.1    # For audio file manipulation
-requests>=2.26.0 # For HTTP communication (if needed)
 python-multipart>=0.0.6  # For handling multipart data
 python-jose>=3.3.0      # For JWT authentication (if needed)
 fastapi>=0.68.0         # For REST API (if needed)

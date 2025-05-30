@@ -1,7 +1,7 @@
-@echo off
+@echo on
 
-:: Check if Python is installed
-echo Checking Python installation...
+:: Check Python installation
+echo Setting up MasterMatcher environment...
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo Python is not installed. Please install Python 3.8 or higher.
@@ -49,6 +49,15 @@ if not exist .env (
 
 :: Create directories
 echo Creating necessary directories...
+if not exist logs mkdir logs
+if not exist processed mkdir processed
+if not exist temp mkdir temp
+
+:: Success message
+echo Environment setup complete!
+echo You can now run the application using: python src/server.py
+
+exit /b 0
 mkdir temp
 mkdir processed
 mkdir logs

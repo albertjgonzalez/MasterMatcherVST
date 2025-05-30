@@ -43,14 +43,18 @@ def process_audio(user_track_path: str, reference_track_path: str, output_path: 
         os.makedirs(output_dir, exist_ok=True)
         
         # Process audio using Matchering
+        # Note: In newer versions of Matchering, we don't need to call init()
+        # Note: The API has changed in newer versions
         mg.process(
             target=user_track_path,
             reference=reference_track_path,
             results=[
                 mg.pcm24(output_path)
-            ],
-            log=logger.info
+            ]
         )
+        
+        # Log success manually since we removed the log parameter
+        logger.info("Processing complete!")
         
         logger.info("Processing complete!")
         return {
