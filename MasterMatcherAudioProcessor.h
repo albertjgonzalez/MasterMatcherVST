@@ -1,12 +1,14 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <string>
+#include <memory>
 
-class MatcheringVSTAudioProcessor  : public juce::AudioProcessor
+class MasterMatcherAudioProcessor : public juce::AudioProcessor
 {
 public:
-    MatcheringVSTAudioProcessor();
-    ~MatcheringVSTAudioProcessor() override;
+    MasterMatcherAudioProcessor();
+    ~MasterMatcherAudioProcessor() override;
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -31,6 +33,18 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    // Audio file management
+    bool loadUserTrack(const juce::File& file);
+    bool loadReferenceTrack(const juce::File& file);
+    bool processTracks();
+    juce::File getProcessedTrack() const;
+
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MatcheringVSTAudioProcessor)
+    juce::File userTrackFile;
+    juce::File referenceTrackFile;
+    juce::File processedTrackFile;
+    bool isProcessing = false;
+    std::unique_ptr<juce::Thread> processingThread;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MasterMatcherAudioProcessor)
 };

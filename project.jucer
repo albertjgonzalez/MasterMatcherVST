@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <JUCERPROJECT version="7.0.11">
     <PROJECTSETTINGS>
-        <NAME>MatcheringVST</NAME>
+        <NAME>MasterMatcher</NAME>
         <COMPANYNAME>LeftEarAudio</COMPANYNAME>
-        <BUNDLEIDENTIFIER>com.leftear.audio.matcheringvst</BUNDLEIDENTIFIER>
+        <BUNDLEIDENTIFIER>com.leftear.audio.mastermatcher</BUNDLEIDENTIFIER>
         <PRODUCTCODE>12345678</PRODUCTCODE>
         <PROJECTTYPE>AUDIO_PLUGIN</PROJECTTYPE>
         <PLUGINFORMATS>
@@ -11,7 +11,7 @@
             <FORMAT>AU</FORMAT>
             <FORMAT>AAX</FORMAT>
         </PLUGINFORMATS>
-        <PLUGINNAME>Matchering VST</PLUGINNAME>
+        <PLUGINNAME>MasterMatcher</PLUGINNAME>
         <PLUGINGUID>12345678-1234-1234-1234-123456789012</PLUGINGUID>
         <PLUGINLAYOUT>STANDARD</PLUGINLAYOUT>
         <PLUGINLAYOUTWIDTH>600</PLUGINLAYOUTWIDTH>
@@ -29,10 +29,10 @@
         <GROUP>
             <NAME>Source Files</NAME>
             <FILES>
-                <FILE>PluginProcessor.h</FILE>
-                <FILE>PluginProcessor.cpp</FILE>
-                <FILE>PluginEditor.h</FILE>
-                <FILE>PluginEditor.cpp</FILE>
+                <FILE>MasterMatcherAudioProcessor.h</FILE>
+                <FILE>MasterMatcherAudioProcessor.cpp</FILE>
+                <FILE>MasterMatcherAudioProcessorEditor.h</FILE>
+                <FILE>MasterMatcherAudioProcessorEditor.cpp</FILE>
             </FILES>
         </GROUP>
         <GROUP>
